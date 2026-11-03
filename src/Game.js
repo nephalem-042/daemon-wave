@@ -46,6 +46,12 @@ export class Game {
     this.#resetRun();
   }
 
+  /** Called when the player switches between touch and keyboard/mouse. */
+  setTouch(on) {
+    this.touch = on;
+    this.hud.touch = on;
+  }
+
   /**
    * The game always works in CONFIG.width x CONFIG.height logical units. The
    * canvas backing store can be larger (high-DPI screens) so everything stays sharp.

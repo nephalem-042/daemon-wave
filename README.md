@@ -21,7 +21,7 @@ ES modules do not work from `file://`, so a local server is required.
 
 On phones and tablets the game switches to touch mode: ◀ ▶ buttons to move, a big FIRE button (hold it for the beam) and a SOUND button. Tapping the screen also starts a run. The layout adapts to portrait and landscape.
 
-To try touch mode on a desktop, open the page with `?touch=1` (for example `http://localhost:8000/?touch=1`).
+The layout is picked automatically and follows the device you actually use: touching the screen shows the on-screen controls, and using a mouse or keyboard hides them. To force a mode, add `?touch=1` (touch) or `?touch=0` (keyboard and mouse) to the URL, for example `http://localhost:8000/?touch=0`.
 
 ## Power-ups
 
