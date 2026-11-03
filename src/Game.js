@@ -14,13 +14,16 @@ const HIGH_SCORE_KEY = 'daemonwave.highScore';
 const MAX_FRAME_TIME = 0.05; // seconds; avoids huge jumps after a tab switch
 
 export class Game {
-  constructor(canvas) {
-    canvas.width = CONFIG.width;
-    canvas.height = CONFIG.height;
+  constructor(canvas, { touch = false } = {}) {
+    this.touch = touch;
+
+    this.canvas = canvas;
+    this.renderScale = 1;
+    this.setRenderScale(1);
 
     this.ctx = canvas.getContext('2d');
     this.input = new Input();
-    this.hud = new Hud();
+    this.hud = new Hud({ touch });
     this.sfx = new Sfx();
     this.background = new Background();
 
@@ -28,11 +31,29 @@ export class Game {
     this.highScore = this.#loadHighScore();
     this.lastTime = 0;
 
-    // Browsers only start audio after a user gesture.
-    window.addEventListener('keydown', () => this.sfx.unlock());
-    window.addEventListener('pointerdown', () => this.sfx.unlock());
+    // Browsers only start audio after a user gesture (iOS wants the release of a touch).
+    for (const type of ['keydown', 'pointerdown', 'pointerup', 'touchend']) {
+      window.addEventListener(type, () => this.sfx.unlock());
+    }
+
+    // Tapping the screen starts or restarts a run, like pressing Space.
+    canvas.addEventListener('pointerdown', () => {
+      if (this.state === STATE.PLAYING) return;
+      this.input.setKey('Space', true);
+      this.input.setKey('Space', false);
+    });
 
     this.#resetRun();
+  }
+
+  /**
+   * The game always works in CONFIG.width x CONFIG.height logical units. The
+   * canvas backing store can be larger (high-DPI screens) so everything stays sharp.
+   */
+  setRenderScale(scale) {
+    this.renderScale = scale;
+    this.canvas.width = Math.round(CONFIG.width * scale);
+    this.canvas.height = Math.round(CONFIG.height * scale);
   }
 
   start() {
@@ -176,6 +197,7 @@ export class Game {
         this.lives -= 1;
         this.player.hit();
         this.sfx.playerHit();
+        if (this.touch) globalThis.navigator?.vibrate?.(80);
         break;
       }
     }
@@ -247,6 +269,7 @@ export class Game {
 
   #draw() {
     const { ctx } = this;
+    ctx.setTransform(this.renderScale, 0, 0, this.renderScale, 0, 0);
     this.background.draw(ctx);
 
     for (const barrier of this.powerUps.barriers) if (barrier.alive) barrier.draw(ctx);
@@ -268,10 +291,14 @@ export class Game {
     this.hud.drawStatus(ctx, this.#statusLines());
 
     if (this.state === STATE.START) {
-      this.hud.drawMessage(ctx, 'DAEMON WAVE', 'Press Space to jack in');
+      this.hud.drawMessage(ctx, 'DAEMON WAVE', this.#prompt('jack in'));
     } else if (this.state === STATE.GAME_OVER) {
-      this.hud.drawMessage(ctx, 'CONNECTION LOST', `Score ${this.score}. Press Space to reconnect`);
+      this.hud.drawMessage(ctx, 'CONNECTION LOST', `Score ${this.score}. ${this.#prompt('reconnect')}`);
     }
+  }
+
+  #prompt(action) {
+    return `${this.touch ? 'Tap FIRE' : 'Press Space'} to ${action}`;
   }
 
   #statusLines() {

@@ -17,6 +17,12 @@ ES modules do not work from `file://`, so a local server is required.
 - Fire: Space
 - Mute: M
 
+## Mobile
+
+On phones and tablets the game switches to touch mode: ◀ ▶ buttons to move, a big FIRE button (hold it for the beam) and a SOUND button. Tapping the screen also starts a run. The layout adapts to portrait and landscape.
+
+To try touch mode on a desktop, open the page with `?touch=1` (for example `http://localhost:8000/?touch=1`).
+
 ## Power-ups
 
 Destroyed enemies sometimes drop a power-up. Catch it with your ship.
@@ -35,4 +41,4 @@ Drop chance, durations, distances and barrier health live in `powerups` inside `
 - `src/Sfx.js`: procedural sound effects (Web Audio, no audio files)
 - `src/config.js`: all tunable values (colors, speeds, glyphs)
 - `src/entities/`: `Entity` → `Ship` → `Player` / `Enemy`, plus `Bullet` and `Fleet`
-- `src/ui/`: `Hud` (stats and overlay messages) and `Background`
+- `src/ui/`: `Hud` (stats and overlay messages), `Background` and `TouchControls` (on-screen buttons)

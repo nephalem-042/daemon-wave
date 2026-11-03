@@ -3,6 +3,10 @@ import { CONFIG } from '../config.js';
 const FONT = `16px ${CONFIG.font}`;
 
 export class Hud {
+  constructor({ touch = false } = {}) {
+    this.touch = touch;
+  }
+
   drawStats(ctx, { score, highScore, lives, level, muted }) {
     ctx.font = FONT;
     ctx.fillStyle = CONFIG.colors.text;
@@ -20,7 +24,7 @@ export class Hud {
       ctx.font = `12px ${CONFIG.font}`;
       ctx.fillStyle = CONFIG.colors.muted;
       ctx.textBaseline = 'bottom';
-      ctx.fillText('SOUND OFF (M)', CONFIG.width - 12, CONFIG.height - 10);
+      ctx.fillText(this.touch ? 'SOUND OFF' : 'SOUND OFF (M)', CONFIG.width - 12, CONFIG.height - 10);
     }
   }
 

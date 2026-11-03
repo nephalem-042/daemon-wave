@@ -2,14 +2,33 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#07050f">
   <title>Daemon Wave</title>
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
   <main>
-    <canvas id="game"></canvas>
+    <div class="stage">
+      <canvas id="game"></canvas>
+    </div>
+
     <p class="hint">Move with ← → or A D. Fire with Space. Mute with M.</p>
+
+    <!-- On-screen controls: only shown on touch devices (see style.css). -->
+    <div class="pad" aria-label="Movement">
+      <span class="btn" data-key="ArrowLeft" aria-hidden="true">
+        <svg viewBox="0 0 24 24" width="40" height="40"><path d="M15 4 L7 12 L15 20" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </span>
+      <span class="btn" data-key="ArrowRight" aria-hidden="true">
+        <svg viewBox="0 0 24 24" width="40" height="40"><path d="M9 4 L17 12 L9 20" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </span>
+    </div>
+
+    <div class="action">
+      <button type="button" class="btn btn-fire" data-key="Space">FIRE</button>
+      <button type="button" class="btn btn-small" data-key="KeyM" aria-label="Toggle sound">SOUND</button>
+    </div>
   </main>
   <script type="module" src="src/main.js"></script>
 </body>
