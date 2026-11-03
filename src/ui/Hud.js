@@ -3,7 +3,7 @@ import { CONFIG } from '../config.js';
 const FONT = `16px ${CONFIG.font}`;
 
 export class Hud {
-  drawStats(ctx, { score, highScore, lives, level }) {
+  drawStats(ctx, { score, highScore, lives, level, muted }) {
     ctx.font = FONT;
     ctx.fillStyle = CONFIG.colors.text;
     ctx.textBaseline = 'top';
@@ -15,6 +15,13 @@ export class Hud {
     ctx.textAlign = 'right';
     ctx.fillText(`HI ${highScore}`, CONFIG.width - 12, 10);
     ctx.fillText(`WAVE ${level}`, CONFIG.width - 12, 32);
+
+    if (muted) {
+      ctx.font = `12px ${CONFIG.font}`;
+      ctx.fillStyle = CONFIG.colors.muted;
+      ctx.textBaseline = 'bottom';
+      ctx.fillText('SOUND OFF (M)', CONFIG.width - 12, CONFIG.height - 10);
+    }
   }
 
   drawMessage(ctx, title, subtitle) {

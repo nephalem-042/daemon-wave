@@ -7,6 +7,7 @@ export const CONFIG = {
     grid: 'rgba(0, 229, 255, 0.07)',
     text: '#e6f9ff',
     title: '#00e5ff',
+    muted: '#8a7fa8',
     player: '#00e5ff',
     playerBullet: '#e6f9ff',
     enemyBullet: '#ff2e97',

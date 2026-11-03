@@ -1,5 +1,6 @@
 import { CONFIG } from './config.js';
 import { Input } from './Input.js';
+import { Sfx } from './Sfx.js';
 import { Player } from './entities/Player.js';
 import { Fleet } from './entities/Fleet.js';
 import { Hud } from './ui/Hud.js';
@@ -17,11 +18,16 @@ export class Game {
     this.ctx = canvas.getContext('2d');
     this.input = new Input();
     this.hud = new Hud();
+    this.sfx = new Sfx();
     this.background = new Background();
 
     this.state = STATE.START;
     this.highScore = this.#loadHighScore();
     this.lastTime = 0;
+
+    // Browsers only start audio after a user gesture.
+    window.addEventListener('keydown', () => this.sfx.unlock());
+    window.addEventListener('pointerdown', () => this.sfx.unlock());
 
     this.#resetRun();
   }
@@ -55,10 +61,13 @@ export class Game {
   }
 
   #update(dt) {
+    if (this.input.wasPressed('KeyM')) this.sfx.toggleMute();
+
     if (this.state !== STATE.PLAYING) {
       if (this.input.wasPressed('Space') || this.input.wasPressed('Enter')) {
         this.#resetRun();
         this.state = STATE.PLAYING;
+        this.sfx.start();
       }
       return;
     }
@@ -68,7 +77,10 @@ export class Game {
 
     if (this.input.isDown('Space')) {
       const bullet = this.player.tryShoot();
-      if (bullet) this.playerBullets.push(bullet);
+      if (bullet) {
+        this.playerBullets.push(bullet);
+        this.sfx.shoot();
+      }
     }
 
     this.enemyBullets.push(...this.fleet.update(dt));
@@ -87,6 +99,7 @@ export class Game {
           bullet.alive = false;
           enemy.alive = false;
           this.score += enemy.points;
+          this.sfx.enemyDestroyed();
         }
       }
     }
@@ -97,6 +110,7 @@ export class Game {
         bullet.alive = false;
         this.lives -= 1;
         this.player.hit();
+        this.sfx.playerHit();
         break;
       }
     }
@@ -115,6 +129,7 @@ export class Game {
 
     if (this.fleet.isCleared) {
       this.level += 1;
+      this.sfx.waveClear();
       this.fleet = new Fleet(this.level);
       this.playerBullets = [];
       this.enemyBullets = [];
@@ -123,6 +138,7 @@ export class Game {
 
   #endRun() {
     this.state = STATE.GAME_OVER;
+    this.sfx.gameOver();
     if (this.score > this.highScore) {
       this.highScore = this.score;
       this.#saveHighScore();
@@ -143,6 +159,7 @@ export class Game {
       highScore: this.highScore,
       lives: this.lives,
       level: this.level,
+      muted: this.sfx.muted,
     });
 
     if (this.state === STATE.START) {
