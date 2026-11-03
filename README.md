@@ -17,10 +17,21 @@ ES modules do not work from `file://`, so a local server is required.
 - Fire: Space
 - Mute: M
 
+## Power-ups
+
+Destroyed enemies sometimes drop a power-up. Catch it with your ship.
+
+- **F (Fork)**: two copies of your ship fly beside you and fire with you for a while.
+- **W (Firewall)**: three barriers appear in front of you and absorb enemy fire until they break.
+- **B (Beam)**: hold Space to fire a continuous beam that destroys everything in its column. It has 3 seconds of charge, spent only while firing.
+
+Drop chance, durations, distances and barrier health live in `powerups` inside `src/config.js`.
+
 ## Structure
 
 - `src/Game.js`: game loop, states, collisions
 - `src/Input.js`: keyboard handling
+- `src/PowerUps.js`: state of active power-ups (fork copies, barriers, beam charge)
 - `src/Sfx.js`: procedural sound effects (Web Audio, no audio files)
 - `src/config.js`: all tunable values (colors, speeds, glyphs)
 - `src/entities/`: `Entity` → `Ship` → `Player` / `Enemy`, plus `Bullet` and `Fleet`

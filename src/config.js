@@ -42,6 +42,42 @@ export const CONFIG = {
     rowPoints: [40, 30, 20, 10],
   },
 
+  powerups: {
+    // Chance (0 to 1) that a destroyed enemy drops a power-up.
+    dropChance: 0.03,
+    fallSpeed: 110,
+    pickupSize: 24,
+
+    // Pickup look. Drop type is chosen at random from these keys.
+    types: {
+      fork: { label: 'F', color: '#00e5ff' },
+      firewall: { label: 'W', color: '#39ff88' },
+      beam: { label: 'B', color: '#f5e642' },
+    },
+
+    // Two copies of your ship that mirror you and fire when you fire.
+    fork: {
+      duration: 10, // seconds
+      offset: 70, // px between you and each copy
+      warnBelow: 2, // seconds left when the copies start blinking
+    },
+
+    // Barriers in front of you that absorb enemy fire.
+    firewall: {
+      count: 3,
+      hits: 3, // hits each barrier can take
+      width: 70,
+      height: 12,
+      distanceAbovePlayer: 70,
+    },
+
+    // Hold Space to fire a continuous beam. Charge only drains while firing.
+    beam: {
+      duration: 3, // seconds of beam time
+      width: 10,
+    },
+  },
+
   fleet: {
     cols: 8,
     rows: 4,

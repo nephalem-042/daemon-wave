@@ -24,6 +24,17 @@ export class Hud {
     }
   }
 
+  /** Active power-up readouts, stacked from the bottom-left corner. */
+  drawStatus(ctx, lines) {
+    ctx.font = `12px ${CONFIG.font}`;
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'bottom';
+    lines.forEach((line, i) => {
+      ctx.fillStyle = line.color;
+      ctx.fillText(line.text, 12, CONFIG.height - 10 - i * 16);
+    });
+  }
+
   drawMessage(ctx, title, subtitle) {
     ctx.fillStyle = CONFIG.colors.overlay;
     ctx.fillRect(0, 0, CONFIG.width, CONFIG.height);

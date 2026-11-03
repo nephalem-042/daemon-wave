@@ -10,6 +10,7 @@ export class Sfx {
     this.ctx = null;
     this.master = null;
     this.noiseBuffer = null;
+    this.beamVoice = null;
     this.muted = this.#loadMuted();
   }
 
@@ -28,6 +29,7 @@ export class Sfx {
 
   toggleMute() {
     this.muted = !this.muted;
+    if (this.muted) this.setBeam(false);
     this.#saveMuted();
   }
 
@@ -53,8 +55,53 @@ export class Sfx {
     this.#arpeggio([523, 659, 784, 1047], { type: 'square', step: 0.09, duration: 0.14 });
   }
 
+  powerUp() {
+    this.#arpeggio([440, 660, 880, 1320], { type: 'square', step: 0.05, duration: 0.08 });
+  }
+
+  barrierHit() {
+    this.#tone({ type: 'square', from: 180, to: 90, duration: 0.08, volume: 0.4 });
+    this.#noise({ duration: 0.05, volume: 0.3 });
+  }
+
+  /** Continuous beam hum. Safe to call every frame. */
+  setBeam(on) {
+    const shouldPlay = on && this.#isReady();
+    if (shouldPlay && !this.beamVoice) this.#startBeam();
+    else if (!shouldPlay && this.beamVoice) this.#stopBeam();
+  }
+
   gameOver() {
     this.#arpeggio([392, 330, 262, 196], { type: 'sawtooth', step: 0.2, duration: 0.3 });
+  }
+
+  #startBeam() {
+    const t = this.ctx.currentTime;
+    const gain = this.ctx.createGain();
+    gain.gain.setValueAtTime(0.001, t);
+    gain.gain.exponentialRampToValueAtTime(0.25, t + 0.05);
+    gain.connect(this.master);
+
+    // Two slightly detuned saws give the hum its beating character.
+    const oscillators = [110, 113].map((freq) => {
+      const osc = this.ctx.createOscillator();
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(freq, t);
+      osc.connect(gain);
+      osc.start(t);
+      return osc;
+    });
+
+    this.beamVoice = { oscillators, gain };
+  }
+
+  #stopBeam() {
+    const { oscillators, gain } = this.beamVoice;
+    const t = this.ctx.currentTime;
+    gain.gain.setValueAtTime(0.25, t);
+    gain.gain.exponentialRampToValueAtTime(0.001, t + 0.08);
+    for (const osc of oscillators) osc.stop(t + 0.1);
+    this.beamVoice = null;
   }
 
   #isReady() {

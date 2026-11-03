@@ -1,5 +1,6 @@
 import { Ship } from './Ship.js';
 import { Bullet } from './Bullet.js';
+import { drawChevron } from './chevron.js';
 import { CONFIG } from '../config.js';
 
 /** The hacker's ICE-breaker: a chevron at the bottom of the screen. */
@@ -33,13 +34,7 @@ export class Player extends Ship {
   tryShoot() {
     if (this.cooldown > 0) return null;
     this.cooldown = CONFIG.player.cooldown;
-    const { width, height, playerSpeed } = CONFIG.bullet;
-    return new Bullet(
-      this.x + (this.width - width) / 2,
-      this.y - height,
-      -playerSpeed,
-      CONFIG.colors.playerBullet,
-    );
+    return Bullet.fromShip(this, -CONFIG.bullet.playerSpeed, CONFIG.colors.playerBullet);
   }
 
   hit() {
@@ -49,19 +44,6 @@ export class Player extends Ship {
   draw(ctx) {
     // Blink while invulnerable.
     if (this.isInvulnerable && Math.floor(this.invulnerable * 10) % 2 === 0) return;
-
-    const { x, y, width, height } = this;
-    ctx.save();
-    ctx.fillStyle = this.color;
-    ctx.shadowColor = this.color;
-    ctx.shadowBlur = 10;
-    ctx.beginPath();
-    ctx.moveTo(x + width / 2, y);
-    ctx.lineTo(x + width, y + height);
-    ctx.lineTo(x + width / 2, y + height - 6);
-    ctx.lineTo(x, y + height);
-    ctx.closePath();
-    ctx.fill();
-    ctx.restore();
+    drawChevron(ctx, this, this.color);
   }
 }
